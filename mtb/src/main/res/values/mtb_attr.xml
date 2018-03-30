@@ -1,0 +1,10 @@
+<resources>
+    <declare-styleable name="MTB">
+        <attr name="entries" />
+        <attr name="fontStyle" />
+        <attr name="indicator_height" format="dimension"/>
+        <attr name="tintColor" format="reference" />
+        <attr name="stretch" format="boolean"/>
+    </declare-styleable>
+
+</resources>
