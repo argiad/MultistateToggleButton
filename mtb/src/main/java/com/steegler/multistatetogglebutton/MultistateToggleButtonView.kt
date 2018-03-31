@@ -1,6 +1,9 @@
 package com.steegler.multistatetogglebutton
 
 import android.content.Context
+import android.content.res.ColorStateList
+import android.graphics.Typeface
+import android.os.Build
 import android.support.constraint.ConstraintLayout
 import android.support.constraint.ConstraintSet
 import android.support.transition.AutoTransition
@@ -46,9 +49,13 @@ class MultistateToggleButton : ConstraintLayout {
     var buttonsLabels = ArrayList<String>()
     var indicatorHeight = 4f
     var stratch = false
+    var textSize = 13f
+    var textFont: Typeface = Typeface.DEFAULT
+    var textColor: ColorStateList
 
     lateinit var indicatorView: View
     lateinit var linearLayout: LinearLayout
+
     val set = ConstraintSet()
 
 
@@ -71,6 +78,18 @@ class MultistateToggleButton : ConstraintLayout {
             indicatorHeight = array.getDimension(R.styleable.MTB_indicator_height, 4f)
 
             stratch = array.getBoolean(R.styleable.MTB_stretch, false)
+
+            textSize = array.getFloat(R.styleable.MTB_textSize, 13f)
+
+            val textColorRes = array.getResourceId(R.styleable.MTB_textColorList, 0)
+            textColor = resources.getColorStateList(if (textColorRes != 0) textColorRes else R.color.buttons_text_color)
+
+            val fontFamilyName = array.getResourceId(R.styleable.MTB_textFont, 0)
+            textFont = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                if (fontFamilyName != 0) resources.getFont(fontFamilyName) else Typeface.DEFAULT
+            } else {
+                Typeface.DEFAULT
+            }
 
 
         } finally {
@@ -107,6 +126,8 @@ class MultistateToggleButton : ConstraintLayout {
             btn.background = null
             btn.tag = index
             btn.setBackgroundColor(resources.getColor(android.R.color.transparent))
+            btn.textSize = textSize
+            btn.setTextColor(textColor)
 
             if (stratch) {
                 if (index == 0) btn.gravity = Gravity.LEFT
@@ -125,14 +146,14 @@ class MultistateToggleButton : ConstraintLayout {
     private fun highlightButton() {
         var currentButton: Button? = null
         for (i in 0 until linearLayout.childCount) {
-            (linearLayout.getChildAt(i) as Button).setTextColor(resources.getColor(android.R.color.white))
+            (linearLayout.getChildAt(i) as Button).isSelected = false
             if ((linearLayout.getChildAt(i) as Button).tag == selectedPosition)
                 currentButton = (linearLayout.getChildAt(i) as Button)
 
         }
 
         currentButton.notNull {
-            it.setTextColor(resources.getColor(R.color.tomato_red))
+            it.isSelected = true
             val margin = ((width / buttonsLabels.size) * selectedPosition)
 
             set.connect(indicatorView.id, ConstraintSet.TOP, id, ConstraintSet.TOP, 1)

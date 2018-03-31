@@ -5,6 +5,9 @@
         <attr name="indicator_height" format="dimension"/>
         <attr name="tintColor" format="reference" />
         <attr name="stretch" format="boolean"/>
+        <attr name="textFont" format="reference"/>
+        <attr name="textSize" format="dimension"/>
+        <attr name="textColorList" format="reference"/>
     </declare-styleable>
 
 </resources>
