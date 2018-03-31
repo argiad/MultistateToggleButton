@@ -3,7 +3,6 @@ package com.steegler.multistatetogglebutton
 import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Typeface
-import android.os.Build
 import android.support.constraint.ConstraintLayout
 import android.support.constraint.ConstraintSet
 import android.support.transition.AutoTransition
@@ -53,8 +52,8 @@ class MultistateToggleButton : ConstraintLayout {
     var textFont: Typeface = Typeface.DEFAULT
     var textColor: ColorStateList
 
-    lateinit var indicatorView: View
-    lateinit var linearLayout: LinearLayout
+    var indicatorView: View
+    var linearLayout: LinearLayout
 
     val set = ConstraintSet()
 
@@ -84,17 +83,12 @@ class MultistateToggleButton : ConstraintLayout {
             val textColorRes = array.getResourceId(R.styleable.MTB_textColorList, 0)
             textColor = resources.getColorStateList(if (textColorRes != 0) textColorRes else R.color.buttons_text_color)
 
-            val fontFamilyName = array.getResourceId(R.styleable.MTB_textFont, 0)
-            textFont = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                if (fontFamilyName != 0) resources.getFont(fontFamilyName) else Typeface.DEFAULT
-            } else {
-                Typeface.DEFAULT
-            }
-
-
         } finally {
             attributes.recycle()
         }
+
+        linearLayout = LinearLayout(context)
+        indicatorView = View(context)
 
         afterMeasured {
             if (buttonsLabels.size > 0) createButtonsLine()
@@ -128,16 +122,20 @@ class MultistateToggleButton : ConstraintLayout {
             btn.setBackgroundColor(resources.getColor(android.R.color.transparent))
             btn.textSize = textSize
             btn.setTextColor(textColor)
+            btn.typeface = textFont
 
             if (stratch) {
-                if (index == 0) btn.gravity = Gravity.LEFT
-                if (index == buttonsLabels.size - 1) btn.gravity = Gravity.RIGHT
+                if (index == 0) btn.gravity = Gravity.START
+                if (index == buttonsLabels.size - 1) btn.gravity = Gravity.END
             }
 
             btn.setOnClickListener({
                 selectedPosition = index
 
             })
+
+            btn.isSelected = selectedPosition == index
+
             linearLayout.addView(btn, layoutParams)
         }
 
@@ -148,7 +146,7 @@ class MultistateToggleButton : ConstraintLayout {
         for (i in 0 until linearLayout.childCount) {
             (linearLayout.getChildAt(i) as Button).isSelected = false
             if ((linearLayout.getChildAt(i) as Button).tag == selectedPosition)
-                currentButton = (linearLayout.getChildAt(i) as Button)
+                currentButton = (linearLayout?.getChildAt(i) as Button)
 
         }
 
@@ -173,6 +171,7 @@ class MultistateToggleButton : ConstraintLayout {
     }
 
     private fun drawIndicator() {
+        val margin = ((width / buttonsLabels.size) * selectedPosition)
         indicatorView = View(context)
         val indicatorWidth = (width / buttonsLabels.size)
         indicatorView.id = View.generateViewId()
@@ -182,7 +181,7 @@ class MultistateToggleButton : ConstraintLayout {
 
         set.clone(this)
         set.connect(indicatorView.id, ConstraintSet.TOP, id, ConstraintSet.TOP, 1)
-        set.connect(indicatorView.id, ConstraintSet.START, id, ConstraintSet.START, 0)
+        set.connect(indicatorView.id, ConstraintSet.START, id, ConstraintSet.START, margin)
         set.constrainWidth(indicatorView.id, indicatorWidth)
         set.constrainHeight(indicatorView.id, indicatorHeight.toInt())
         set.applyTo(this)
