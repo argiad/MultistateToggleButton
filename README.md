@@ -14,6 +14,42 @@ Draft for Multi State Toggle Button, created for commercial project
             app:entries="@array/power_state"
             app:stretch="true">
 ```
+```kotlin
+    private lateinit var mtbSport: MultistateToggleButton
+    private lateinit var mtbThrottle: MultistateToggleButton
+
+    ...
+
+    override fun initWidgets(fragmentView: View) {
+
+        mtbSport = fragmentView.findViewById(R.id.mtbSport)
+        mtbThrottle = fragmentView.findViewById(R.id.mtbThrottle)
+        mtbSport.callback = this
+        mtbThrottle.callback = this
+        
+        // Set textfont
+        ResourcesCompat.getFont(mContext, R.font.simple_light)?.notNull {
+            mtbSport.textFont = it
+            mtbThrottle.textFont = it
+        }
+        mtbSport.selectedPosition = 1
+        mtbThrottle.selectedPosition = 2
+    }
+
+    // implementation of MultistateToggleButton.MTBInterface  
+    override fun onStateChanged(view: View, index: Int) {
+        when (view.id) {
+            R.id.mtbSport -> {
+                log("Sport $index")
+            }
+            R.id.mtbThrottle -> {
+                log("Throttle $index")
+            }
+        }
+
+    }
+```
+
 
 
 MIT License
